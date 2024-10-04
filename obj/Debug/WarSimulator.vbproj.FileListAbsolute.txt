@@ -1,0 +1,11 @@
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.exe.config
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.exe
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.pdb
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.xml
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.vbproj.AssemblyReference.cache
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.Resources.resources
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.vbproj.GenerateResource.cache
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.vbproj.CoreCompileInputs.cache
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.exe
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.xml
+C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\obj\Debug\WarSimulator.pdb
