@@ -144,7 +144,7 @@ Module Module1
 
         End Sub
 
-        Sub doChoice(ByVal playerCard As Object, ByVal oppCard As Object, ByVal choice As String, Optional isOpponent As Boolean = False, Optional ByVal isComputer As Boolean = False)
+        Sub doChoice(ByVal playerCard As Object, ByVal oppCard As Object, ByVal choice As String, Optional isOpponent As Boolean = False, Optional ByVal isComputer As Boolean = True)
             Dim defendedAttack As Integer
             Select Case choice
                 Case "a"
@@ -211,16 +211,12 @@ Module Module1
                 doChoice(playerCard, oppCard, playerChoice, isComputer:=isComputer)
             Else
                 playerChoice = doOptionButtons(playerCard, oppCard, 23)(0)(0)
-                doChoice(playerCard, oppCard, playerChoice, isComputer:=isComputer)
+                doChoice(oppCard, playerCard, playerChoice, isComputer:=isComputer)
             End If
 
             sprites = doOptionButtons(playerCard, oppCard, 23, True)
 
-            If isComputer Then
-                displayCharAndStats(playerCard, oppCard, sprites(0), sprites(1), isComputer)
-            Else
-                displayCharAndStats(playerCard, oppCard, sprites(0), sprites(1), isComputer)
-            End If
+            displayCharAndStats(playerCard, oppCard, sprites(0), sprites(1))
 
             Console.SetCursorPosition(0, 0)
             If oppCard.Health < 1 Or playerCard.Health < 1 Then
@@ -234,7 +230,7 @@ Module Module1
 
         End Sub
 
-        Sub moveOpponent(ByVal playerCard As Object, ByVal oppCard As Object, ByVal Player As Player, ByVal isComputer As Boolean)
+        Sub moveOpponent(ByVal playerCard As Object, ByVal oppCard As Object, ByVal Player As Player)
             Dim opponentChoice As String
             Dim opponentOptions As New List(Of String)
             Dim sprites As String()() = doOptionButtons(playerCard, oppCard, 23, True)
@@ -383,7 +379,7 @@ Module Module1
 
             Randomize()
             opponentChoice = opponentOptions(CInt(Math.Floor((Rnd() * opponentOptions.Count) + 0)))
-            showOpponentChoice(opponentChoice, playerCard, oppCard, PlayerSprite, OpponentSprite, isComputer:=isComputer)
+            showOpponentChoice(opponentChoice, playerCard, oppCard, PlayerSprite, OpponentSprite)
             doChoice(oppCard, playerCard, opponentChoice, True)
         End Sub
 
@@ -409,7 +405,7 @@ Module Module1
 
                 'check if opp is dead (player wins)
                 If oppCard.Health < 1 Then
-                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite, isComputer:=isComputer)
+                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
                     Player.opponentsKilled += 1
                     Opp.cards.Remove(oppCard)
 
@@ -427,7 +423,7 @@ Module Module1
 
                 'check if player is dead (opponent wins)
                 If playerCard.Health < 1 Then
-                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite, isComputer:=isComputer) ' shows opponent screen
+                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
 
                     cards.Remove(playerCard)
                     opponentsKilled += 1
@@ -443,7 +439,7 @@ Module Module1
                     Exit While
                 End If
 
-                movePlayer(playerCard, oppCard,isComputer)
+                movePlayer(playerCard, oppCard, True)
 
 
 
@@ -451,7 +447,7 @@ Module Module1
 
                 'check if opp is dead (player wins)
                 If oppCard.Health < 1 Then
-                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite, isComputer:=isComputer)
+                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
                     Player.opponentsKilled += 1
                     Opp.cards.Remove(oppCard)
 
@@ -469,7 +465,7 @@ Module Module1
 
                 'check if player is dead (opponent wins)
                 If playerCard.Health < 1 Then
-                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite, isComputer:=isComputer) ' shows opponent screen
+                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
 
                     cards.Remove(playerCard)
                     opponentsKilled += 1
@@ -486,9 +482,9 @@ Module Module1
                 End If
 
                 If isComputer Then
-                    moveOpponent(playerCard, oppCard, Player, isComputer:=isComputer)
+                    moveOpponent(playerCard, oppCard, Player)
                 Else
-                    movePlayer(oppCard, playerCard, isComputer)
+                    movePlayer(playerCard, oppCard, False)
                 End If
 
 
@@ -613,6 +609,55 @@ Module Module1
                                        | /____/  \__/  \__,_/  /_/     \__/  |
                                        |                                     |
                                         -------------------------------------"
+        End If
+        Console.BackgroundColor = bgColor
+        Console.ForegroundColor = fgColor
+        Console.WriteLine(button)
+
+    End Sub
+
+    Sub singleplayer(ByVal selected As Boolean, Optional ByVal bgColor As ConsoleColor = ConsoleColor.Black, Optional ByVal fgColor As ConsoleColor = ConsoleColor.White)
+        Dim button As String = "                                                             
+                                   _____ _             __           __                     
+                                  / ___/(_)___  ____ _/ /__  ____  / /___ ___  _____  _____
+                                  \__ \/ / __ \/ __ `/ / _ \/ __ \/ / __ `/ / / / _ \/ ___/
+                                 ___/ / / / / / /_/ / /  __/ /_/ / / /_/ / /_/ /  __/ /    
+                                /____/_/_/ /_/\__, /_/\___/ .___/_/\__,_/\__, /\___/_/   
+                                             /____/      /_/            /____/             
+                                                                "
+        If selected Then
+            button = "                                -----------------------------------------------------------
+                               |   _____ _             __           __                     |
+                               |  / ___/(_)___  ____ _/ /__  ____  / /___ ___  _____  _____|
+                               |  \__ \/ / __ \/ __ `/ / _ \/ __ \/ / __ `/ / / / _ \/ ___/|
+                               | ___/ / / / / / /_/ / /  __/ /_/ / / /_/ / /_/ /  __/ /    |
+                               |/____/_/_/ /_/\__, /_/\___/ .___/_/\__,_/\__, /\___/_/     |
+                               |             /____/      /_/            /____/             |
+                                -----------------------------------------------------------"
+        End If
+        Console.BackgroundColor = bgColor
+        Console.ForegroundColor = fgColor
+        Console.WriteLine(button)
+
+    End Sub
+    Sub multiplayer(ByVal selected As Boolean, Optional ByVal bgColor As ConsoleColor = ConsoleColor.Black, Optional ByVal fgColor As ConsoleColor = ConsoleColor.White)
+        Dim button As String = "
+                                     __  ___      ____  _       __                     
+                                    /  |/  /_  __/ / /_(_)___  / /___ ___  _____  _____
+                                   / /|_/ / / / / / __/ / __ \/ / __ `/ / / / _ \/ ___/
+                                  / /  / / /_/ / / /_/ / /_/ / / /_/ / /_/ /  __/ /    
+                                 /_/  /_/\__,_/_/\__/_/ .___/_/\__,_/\__, /\___/_/
+                                                   /_/            /____/              
+"
+        If selected Then
+            button = "                                 ------------------------------------------------------
+                                |    __  ___      ____  _       __                     |
+                                |   /  |/  /_  __/ / /_(_)___  / /___ ___  _____  _____|
+                                |  / /|_/ / / / / / __/ / __ \/ / __ `/ / / / _ \/ ___/|
+                                | / /  / / /_/ / / /_/ / /_/ / / /_/ / /_/ /  __/ /    |
+                                |/_/  /_/\__,_/_/\__/_/ .___/_/\__,_/\__, /\___/_/     |
+                                |                  /_/            /____/               |
+                                 ------------------------------------------------------"
         End If
         Console.BackgroundColor = bgColor
         Console.ForegroundColor = fgColor
@@ -767,6 +812,71 @@ Module Module1
 
 
     End Sub
+
+
+
+    Function numberOfPlayers(ByVal title As String) As Boolean
+        Dim input As String
+        Dim inputY As Integer = 1
+        Const bg As ConsoleColor = ConsoleColor.Black
+        Dim fg As ConsoleColor = ConsoleColor.Cyan
+        Dim fgA As ConsoleColor = ConsoleColor.Cyan
+
+        Dim fg2 As ConsoleColor = ConsoleColor.Magenta
+        Dim fgA2 As ConsoleColor = ConsoleColor.Magenta
+        Dim buttonGap As Integer = 3
+
+        Console.ForegroundColor = ConsoleColor.DarkRed
+        Console.WriteLine(title)
+        Console.ForegroundColor = ConsoleColor.White
+        singleplayer(True, bg, fgA)
+        For lineNum As Integer = 0 To buttonGap
+            Console.WriteLine()
+        Next
+        multiplayer(False, bg, fg2)
+        Console.SetCursorPosition(0, 0)
+        While True
+            input = Console.ReadKey(True).Key
+            If input = 38 Or input = 87 Then
+                If inputY = 0 Then
+                    inputY = 1
+                End If
+            ElseIf input = 40 Or input = 83 Then
+                If inputY = 1 Then
+
+                    inputY = 0
+                End If
+            ElseIf input = 13 Or input = 32 Then
+
+                If inputY = 0 Then
+                    Return False
+                ElseIf inputY = 1 Then
+                    Return True
+                End If
+
+            End If
+
+            Console.Clear()
+            Console.ForegroundColor = ConsoleColor.DarkRed
+            Console.WriteLine(title)
+
+            If inputY = 1 Then
+                singleplayer(True, bg, fgA)
+                For lineNum As Integer = 0 To buttonGap
+                    Console.WriteLine()
+                Next
+                multiplayer(False, bg, fg2)
+            ElseIf inputY = 0 Then
+                singleplayer(False, bg, fg)
+                For lineNum As Integer = 0 To buttonGap
+                    Console.WriteLine()
+                Next
+                multiplayer(True, bg, fgA2)
+            End If
+            Console.SetCursorPosition(0, 0)
+        End While
+
+    End Function
     Sub Debug(ByVal Str As Object)
         Console.Clear()
         Console.WriteLine(Str)
@@ -1523,7 +1633,7 @@ Module Module1
 
     End Function
 
-    Sub shop(ByVal player As Player)
+    Sub shop(ByVal player As Player, ByVal isComputer As Boolean, ByVal turn As Integer)
         'ANSI SHADOW
         Const title As String = "       █     █░ ▄▄▄       ██▀███       ██████  ██▓ ███▄ ▄███▓ █    ██  ██▓    ▄▄▄     ▄▄▄█████▓ ▒█████   ██▀███  
        ▓█░ █ ░█░▒████▄    ▓██ ▒ ██▒   ▒██    ▒ ▓██▒▓██▒▀█▀ ██▒ ██  ▓██▒▓██▒   ▒████▄   ▓  ██▒ ▓▒▒██▒  ██▒▓██ ▒ ██▒
@@ -1569,7 +1679,7 @@ Module Module1
                     player.cards.Add(currentCard)
                 Case 3 'Exit
                     Console.Clear()
-                    fightShop(title, player)
+                    fightShop(title, player, isComputer:=isComputer, turn:=turn)
                     Exit While
             End Select
 
@@ -1667,7 +1777,7 @@ Module Module1
         Return kills.ToString.Length + rating.ToString.Length
     End Function
 
-    Sub showkills(ByVal Player As Player, Optional ByVal high As Boolean = False)
+    Sub showkills(ByVal Player As Player, Optional ByVal high As Boolean = False, Optional fg As ConsoleColor = ConsoleColor.Cyan)
         Player.updateRating()
         Dim kills As Integer = Player.opponentsKilled, rating As Integer = Player.rating
 
@@ -1679,11 +1789,11 @@ Module Module1
 
         Console.ForegroundColor = ConsoleColor.White
         If high Then
-            Console.ForegroundColor = ConsoleColor.Cyan
+            Console.ForegroundColor = fg
         End If
 
         Console.Write("                                       Player rating: ")
-        Console.ForegroundColor = ConsoleColor.Cyan
+        Console.ForegroundColor = fg
         If high Then
             Console.ForegroundColor = ConsoleColor.DarkGreen
         End If
@@ -1691,11 +1801,11 @@ Module Module1
 
         Console.ForegroundColor = ConsoleColor.White
         If high Then
-            Console.ForegroundColor = ConsoleColor.Cyan
+            Console.ForegroundColor = fg
         End If
         Console.Write("   Opponents killed: ")
 
-        Console.ForegroundColor = ConsoleColor.Cyan
+        Console.ForegroundColor = fg
         If high Then
             Console.ForegroundColor = ConsoleColor.DarkGreen
         End If
@@ -1706,7 +1816,7 @@ Module Module1
 
     End Sub
 
-    Sub fightShop(ByVal title As String, ByVal player As Player, Optional ByVal yOverride As Boolean = False)
+    Sub fightShop(ByVal title As String, ByVal player As Player, Optional ByVal yOverride As Boolean = False, Optional ByVal isComputer As Boolean = True, Optional ByVal turn As Integer = 0)
         saveRateKills(player)
         Dim input As String
         Dim inputY As Integer = 0
@@ -1720,22 +1830,40 @@ Module Module1
 
         Console.Clear()
         Console.ForegroundColor = ConsoleColor.DarkRed
-        Console.WriteLine(title)
+        Console.Write(title)
         Console.SetCursorPosition(0, Console.CursorTop - 1)
-        showkills(player)
-        Console.WriteLine()
 
 
-        Console.ForegroundColor = ConsoleColor.Gray
-        Console.Write("---------------------------High Score |")
-        showkillshigh(player, True)
 
-        Console.ForegroundColor = ConsoleColor.Gray
 
-        Console.Write(" |High Score")
-        For i As Integer = 0 To 33 - len - 1
-            Console.Write("-")
-        Next
+        If isComputer Then
+            showkills(player)
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write("---------------------------High Score |")
+            showkillshigh(player, True)
+
+            Console.ForegroundColor = ConsoleColor.Gray
+
+            Console.Write(" |High Score")
+            For i As Integer = 0 To 33 - len - 1
+                Console.Write("-")
+            Next
+        Else
+
+
+
+            If turn = 0 Then
+                showkills(player, fg:=ConsoleColor.Cyan)
+                Console.WriteLine()
+                Console.ForegroundColor = ConsoleColor.Cyan
+                Console.Write("---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+            Else
+                showkills(player, fg:=ConsoleColor.Magenta)
+                Console.WriteLine()
+                Console.ForegroundColor = ConsoleColor.Magenta
+                Console.Write("---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+            End If
+        End If
 
         Console.WriteLine(vbNewLine)
 
@@ -1773,7 +1901,7 @@ Module Module1
                 inputY = 0
             ElseIf input = 13 Or input = 32 Then
                 If inputY = 0 Then
-                    shop(player)
+                    shop(player, isComputer:=isComputer, turn:=turn)
                     Exit While
                 ElseIf inputY = 1 Then
                     If player.cards.Count > 0 Then
@@ -1786,27 +1914,40 @@ Module Module1
 
             Console.Clear()
             Console.ForegroundColor = ConsoleColor.DarkRed
-            Console.WriteLine(title)
+            Console.Write(title)
             Console.SetCursorPosition(0, Console.CursorTop - 1)
-            showkills(player)
-            Console.WriteLine()
+            If isComputer Then
+                showkills(player)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write("---------------------------High Score |")
+                showkillshigh(player, True)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+
+                Console.Write(" |High Score")
+                For i As Integer = 0 To 33 - len - 1
+                    Console.Write("-")
+                Next
+            Else
 
 
-            Console.ForegroundColor = ConsoleColor.Gray
-            Console.Write("---------------------------High Score |")
-            showkillshigh(player, True)
 
-            Console.ForegroundColor = ConsoleColor.Gray
-
-            Console.Write(" |High Score")
-            For i As Integer = 0 To 33 - len - 1
-                Console.Write("-")
-            Next
+                If turn = 0 Then
+                    showkills(player, fg:=ConsoleColor.Cyan)
+                    Console.WriteLine()
+                    Console.ForegroundColor = ConsoleColor.Cyan
+                    Console.Write("---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+                Else
+                    showkills(player, fg:=ConsoleColor.Magenta)
+                    Console.WriteLine()
+                    Console.ForegroundColor = ConsoleColor.Magenta
+                    Console.Write("---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+                End If
+            End If
 
             Console.WriteLine(vbNewLine)
 
             Console.ForegroundColor = ConsoleColor.White
-
 
 
             If inputY = 1 Then
@@ -2325,24 +2466,12 @@ Module Module1
         Console.SetCursorPosition(0, 0)
     End Sub
 
-    Sub displayCharAndStats(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSpriteParam As String(), ByVal OpponentSpriteParam As String(), ByVal isComputer As Boolean)
+    Sub displayCharAndStats(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String())
         Dim fg As ConsoleColor = ConsoleColor.White
         Dim bg As ConsoleColor = ConsoleColor.Black
 
         Dim pTextColorFG As ConsoleColor = ConsoleColor.Cyan
         Dim oTextColorFG As ConsoleColor = ConsoleColor.Magenta
-
-        Dim PlayerSprite As String()
-        Dim OpponentSprite As String()
-
-        If isComputer Then
-            PlayerSprite = PlayerSpriteParam
-            OpponentSprite = OpponentSpriteParam
-        Else
-            PlayerSprite = OpponentSpriteParam
-            OpponentSprite = PlayerSpriteParam
-        End If
-
 
         Dim index As Integer = 0
 
@@ -2358,11 +2487,8 @@ Module Module1
             Console.SetCursorPosition(0, Console.CursorTop)
             Console.WriteLine(line)
         Next
-        If isComputer Then
-            showVisualStats(PlayerCard, OpponentCard)
-        Else
-            showVisualStats(OpponentCard, PlayerCard)
-        End If
+
+        showVisualStats(PlayerCard, OpponentCard)
 
         For Each line As String In OpponentSprite
             index = Array.IndexOf(OpponentSprite, line)
@@ -2386,17 +2512,12 @@ Module Module1
         Next
         Console.ForegroundColor = fg
         Console.BackgroundColor = bg
-
-        If isComputer Then
-            ShowVisualStatsOpponent(OpponentCard, PlayerCard)
-        Else
-            ShowVisualStatsOpponent(PlayerCard, OpponentCard)
-        End If
+        ShowVisualStatsOpponent(OpponentCard, PlayerCard)
 
         Console.SetCursorPosition(0, 0)
     End Sub
 
-    Function doOptionButtons(ByVal PlayerCard As Object, ByVal OpponentCard As Object, Optional ByVal yOffset As Integer = 0, Optional ByVal wantSprites As Boolean = False, Optional ByVal isComputer As Boolean = False) As String()()
+    Function doOptionButtons(ByVal PlayerCard As Object, ByVal OpponentCard As Object, Optional ByVal yOffset As Integer = 0, Optional ByVal wantSprites As Boolean = False) As String()()
         Dim rPad As Integer = 2
         Dim maxAttackLen As Integer = 29 + 1 + rPad
         Dim maxDefendLen As Integer = 30 + 1 + rPad
@@ -2475,7 +2596,7 @@ Module Module1
             Return returnValue
         End If
 
-        displayCharAndStats(PlayerCard, OpponentCard, playerSprite, opponentSprite, isComputer)
+        displayCharAndStats(PlayerCard, OpponentCard, playerSprite, opponentSprite)
 
 
 
@@ -2598,7 +2719,7 @@ Module Module1
 
             Console.Clear()
 
-            displayCharAndStats(PlayerCard, OpponentCard, playerSprite, opponentSprite, isComputer:=isComputer)
+            displayCharAndStats(PlayerCard, OpponentCard, playerSprite, opponentSprite)
 
             selectInput(xInput, PlayerCard, OpponentCard, playerSprite, opponentSprite, rPad, yOffset, maxAttackLen, maxDefendLen, maxHealLen)
             Console.SetCursorPosition(0, 0)
@@ -2704,14 +2825,14 @@ Module Module1
 
     End Sub
 
-    Sub playerWon(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String(), ByVal isComputer As Boolean)
+    Sub playerWon(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String())
         Dim winText As String() = {"  _                   _   _              _            ", " |_)  |    /\   \_/  |_  |_)    \    /  / \  |\ |    |", " |    |_  /--\   |   |_  | \     \/\/   \_/  | \|    o", "                                                      "}
         Dim fGw As ConsoleColor = ConsoleColor.Cyan
         Dim cXp As Integer = 34
         Dim line As String
 
         Console.Clear()
-        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite, isComputer)
+        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite)
 
         Console.SetCursorPosition(cXp, 25)
         For lineIndex = 0 To winText.Length - 1
@@ -2724,14 +2845,14 @@ Module Module1
         waitForEnter()
     End Sub
 
-    Sub opponentWon(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String(), ByVal isComputer As Boolean)
+    Sub opponentWon(ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String())
         Dim winText As String() = {"  _    _    _    _          _        ___             _             ", " / \  |_)  |_)  / \  |\ |  |_  |\ |   |     \    /  / \  |\ |    | ", " \_/  |    |    \_/  | \|  |_  | \|   |      \/\/   \_/  | \|    o"}
         Dim fGw As ConsoleColor = ConsoleColor.Magenta
         Dim cXp As Integer = 28
         Dim line As String
 
         Console.Clear()
-        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite, isComputer)
+        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite)
 
         Console.SetCursorPosition(cXp, 25)
         For lineIndex = 0 To winText.Length - 1
@@ -2744,7 +2865,7 @@ Module Module1
         waitForEnter()
     End Sub
 
-    Sub showOpponentChoice(ByVal choice As String, ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String(), ByVal isComputer As Boolean)
+    Sub showOpponentChoice(ByVal choice As String, ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal OpponentSprite As String())
         'Mini smushedU*2
         Dim attack As String() = {"  _. _|_ _|_  _.  _ |  ", " (_|  |_  |_ (_| (_ |<"}
 
@@ -2761,7 +2882,7 @@ Module Module1
         Dim line As String
 
         Console.Clear()
-        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite, isComputer:=isComputer)
+        displayCharAndStats(PlayerCard, OpponentCard, PlayerSprite, OpponentSprite)
 
         Console.SetCursorPosition(cXp, 25)
         For lineIndex = 0 To preText.Length - 1
@@ -3215,7 +3336,7 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
         Const title As String = "       █     █░ ▄▄▄       ██▀███       ██████  ██▓ ███▄ ▄███▓ █    ██  ██▓    ▄▄▄     ▄▄▄█████▓ ▒█████   ██▀███  
        ▓█░ █ ░█░▒████▄    ▓██ ▒ ██▒   ▒██    ▒ ▓██▒▓██▒▀█▀ ██▒ ██  ▓██▒▓██▒   ▒████▄   ▓  ██▒ ▓▒▒██▒  ██▒▓██ ▒ ██▒
        ▒█░ █ ░█ ▒██  ▀█▄  ▓██ ░▄█ ▒   ░ ▓██▄   ▒██▒▓██    ▓██░▓██  ▒██░▒██░   ▒██  ▀█▄ ▒ ▓██░ ▒░▒██░  ██▒▓██ ░▄█ ▒
-       ░█░ █ ░█ ░██▄▄▄▄██ ▒██▀▀█▄       ▒   ██▒░██░▒██    ▒██ ▓▓█  ░██░▒██░   ░██▄▄▄▄██░ ▓██▓ ░ ▒██   ██░▒██▀▀█▄  w
+       ░█░ █ ░█ ░██▄▄▄▄██ ▒██▀▀█▄       ▒   ██▒░██░▒██    ▒██ ▓▓█  ░██░▒██░   ░██▄▄▄▄██░ ▓██▓ ░ ▒██   ██░▒██▀▀█▄  
        ░░██▒██▓  ▓█   ▓██▒░██▓ ▒██▒   ▒██████▒▒░██░▒██▒   ░██▒▒▒█████▓ ░██████▒▓█   ▓██▒ ▒██▒ ░ ░ ████▓▒░░██▓ ▒██▒
        ░ ▓░▒ ▒   ▒▒   ▓▒█░░ ▒▓ ░▒▓░   ▒ ▒▓▒ ▒ ░░▓  ░ ▒░   ░  ░░▒▓▒ ▒ ▒ ░ ▒░▓  ░▒▒   ▓▒█░ ▒ ░░   ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░
          ▒ ░ ░    ▒   ▒▒ ░  ░▒ ░ ▒░   ░ ░▒  ░ ░ ▒ ░░  ░      ░░░▒░ ░ ░ ░ ░ ▒  ░ ▒   ▒▒ ░   ░      ░ ▒ ▒░   ░▒ ░ ▒░
@@ -3232,7 +3353,7 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
         Dim player2PlayerCard As Object
         Dim player2SelectedIndex As Integer
 
-        Dim isComputer As Boolean = False
+        Dim isComputer As Boolean
 
         checkEmpty() 'populates the text file that saves high scores if empty
 
@@ -3240,20 +3361,23 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
 
         startMenu(title) 'displays title
         'tutorial()
-
+        Console.Clear()
+        isComputer = numberOfPlayers(title)
         ' checks if player cant buy any cards and game over if so
         If player1.coins < New BasicKnight().Price And player1.cards.Count < 1 Then
             GameOver(player1)
         End If
 
+
         'opens menu that has option to shop and to continue to fight oponent.
-        fightShop(title, player1, yOverride:=True)
+        fightShop(title, player1, yOverride:=True, isComputer:=isComputer, turn:=0)
         If Not isComputer Then
-            fightShop(title, player2, yOverride:=True)
+            fightShop(title, player2, yOverride:=True, isComputer:=isComputer, turn:=1)
         End If
 
         'updates the player rating
         player1.updateRating()
+        player2.updateRating()
 
         'if opnent has been defeated aldready add a card
 
@@ -3270,7 +3394,7 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
         playerCard = player1.cards(selectedIndex)
         If Not isComputer Then
             player2SelectedIndex = selectCard(player2)
-            player2PlayerCard = player2.cards(selectedIndex)
+            player2PlayerCard = player2.cards(player2SelectedIndex)
         End If
 
 
@@ -3289,17 +3413,29 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
                 Exit While
             End If
 
-            fightShop(title, player1)
 
+            fightShop(title, player1, isComputer:=isComputer, turn:=0)
+            If Not isComputer Then
+                fightShop(title, player2, isComputer:=isComputer, turn:=1)
+            End If
 
             player1.updateRating()
-            If Opp1.cards.Count < 1 Then
+            player2.updateRating()
+
+            If Opp1.cards.Count < 1 And isComputer Then
                 Opp1.addRandomCard(player1.rating, player1)
             End If
 
-            showOpponent(Opp1)
+            If isComputer Then
+                showOpponent(Opp1)
+            End If
+
             selectedIndex = selectCard(player1)
             playerCard = player1.cards(selectedIndex)
+            If Not isComputer Then
+                player2SelectedIndex = selectCard(player2)
+                player2PlayerCard = player2.cards(player2SelectedIndex)
+            End If
         End While
         waitForEnter()
     End Sub
