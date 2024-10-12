@@ -1,4 +1,3 @@
-C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.exe.config
 C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.exe
 C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.pdb
 C:\Users\drshi\Documents\ComputerScience\Visual Basic\WarSimulator\bin\Debug\WarSimulator.xml
