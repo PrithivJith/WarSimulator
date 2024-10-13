@@ -2,6 +2,8 @@
 
 
 Module Module1
+    Public fightTurn As Integer = -1
+
     Function round(ByVal num As Double) As Integer
         If num > 0 Then
             Return Math.Floor(num + 0.5)
@@ -130,6 +132,8 @@ Module Module1
         Public cards As New ArrayList()
         Public opponentsKilled = 0
         Public coins As Integer = 35
+        'Public coins As Integer = 10
+
         Public rating As Double = 0
 
 
@@ -202,15 +206,15 @@ Module Module1
 
             End Select
         End Sub
-        Sub movePlayer(ByVal playerCard As Object, ByVal oppCard As Object, ByVal isComputer As Boolean)
+        Sub movePlayer(ByVal playerCard As Object, ByVal oppCard As Object, ByVal isComputer As Boolean, Optional ByVal playerprompt As Integer = False)
             Dim playerChoice As String
             Dim sprites As String()()
 
             If isComputer Then
-                playerChoice = doOptionButtons(playerCard, oppCard, 23)(0)(0)
+                playerChoice = doOptionButtons(playerCard, oppCard, 23, isComputer:=isComputer)(0)(0)
                 doChoice(playerCard, oppCard, playerChoice, isComputer:=isComputer)
             Else
-                playerChoice = doOptionButtons(playerCard, oppCard, 23)(0)(0)
+                playerChoice = doOptionButtons(playerCard, oppCard, 23, isComputer:=isComputer)(0)(0)
                 doChoice(oppCard, playerCard, playerChoice, isComputer:=isComputer)
             End If
 
@@ -222,7 +226,11 @@ Module Module1
             If oppCard.Health < 1 Or playerCard.Health < 1 Then
                 'Pass
             Else
-                oppMovePrompt()
+                If Not playerprompt Then
+                    oppMovePrompt()
+                Else
+                    playerMovePrompt()
+                End If
                 waitForEnter()
             End If
 
@@ -387,9 +395,10 @@ Module Module1
             If cardIndex = -2763 Then
                 cardIndex = cards.Count - 1 ' last card if card index is 2763 for testing
             End If
-
+            Randomize()
             Dim playerCard As Object = cards(cardIndex)
             Dim oppCard As Object
+            Dim randomStart As Double = Rnd()
 
             If isComputer Then
                 oppCard = Opp.cards((Opp.cards.Count - 1)) ' gets last card of opponent 
@@ -401,98 +410,307 @@ Module Module1
             Dim PlayerSprite As String() = sprites(0)
             Dim OpponentSprite As String() = sprites(1)
 
-            While True
+            If Not isComputer Then
+                If randomStart > 0.5 Then
+                    While True
 
-                'check if opp is dead (player wins)
-                If oppCard.Health < 1 Then
-                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
-                    Player.opponentsKilled += 1
-                    Opp.cards.Remove(oppCard)
+                        'check if opp is dead (player wins)
+                        If oppCard.Health < 1 Then
+                            playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                            Player.opponentsKilled += 1
+                            Opp.cards.Remove(oppCard)
 
-                    Select Case oppCard.Name
-                        Case "Basic Knight"
-                            coins += 10
-                        Case "Trained Soldier"
-                            coins += 15
-                        Case "Legendary Warrior"
-                            coins += 25
-                    End Select
+                            Select Case oppCard.Name
+                                Case "Basic Knight"
+                                    coins += 10
+                                Case "Trained Soldier"
+                                    coins += 15
+                                Case "Legendary Warrior"
+                                    coins += 25
+                            End Select
 
-                    Exit While
-                End If
+                            Exit While
+                        End If
 
-                'check if player is dead (opponent wins)
-                If playerCard.Health < 1 Then
-                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+                        'check if player is dead (opponent wins)
+                        If playerCard.Health < 1 Then
+                            opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
 
-                    cards.Remove(playerCard)
-                    opponentsKilled += 1
+                            cards.Remove(playerCard)
+                            opponentsKilled += 1
 
-                    Select Case playerCard.Name
-                        Case "Basic Knight"
-                            Opp.coins += 10
-                        Case "Trained Soldier"
-                            Opp.coins += 15
-                        Case "Legendary Warrior"
-                            Opp.coins += 25
-                    End Select
-                    Exit While
-                End If
+                            Select Case playerCard.Name
+                                Case "Basic Knight"
+                                    Opp.coins += 10
+                                Case "Trained Soldier"
+                                    Opp.coins += 15
+                                Case "Legendary Warrior"
+                                    Opp.coins += 25
+                            End Select
+                            Exit While
+                        End If
 
-                movePlayer(playerCard, oppCard, True)
+                        If Not isComputer Then
+                            fightTurn = 0
+                        End If
+                        movePlayer(playerCard, oppCard, True, True)
 
 
 
-                'repeats this check after the move
+                        'repeats this check after the move
 
-                'check if opp is dead (player wins)
-                If oppCard.Health < 1 Then
-                    playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
-                    Player.opponentsKilled += 1
-                    Opp.cards.Remove(oppCard)
+                        'check if opp is dead (player wins)
+                        If oppCard.Health < 1 Then
+                            playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                            Player.opponentsKilled += 1
+                            Opp.cards.Remove(oppCard)
 
-                    Select Case oppCard.Name
-                        Case "Basic Knight"
-                            coins += 10
-                        Case "Trained Soldier"
-                            coins += 15
-                        Case "Legendary Warrior"
-                            coins += 25
-                    End Select
+                            Select Case oppCard.Name
+                                Case "Basic Knight"
+                                    coins += 10
+                                Case "Trained Soldier"
+                                    coins += 15
+                                Case "Legendary Warrior"
+                                    coins += 25
+                            End Select
 
-                    Exit While
-                End If
+                            Exit While
+                        End If
 
-                'check if player is dead (opponent wins)
-                If playerCard.Health < 1 Then
-                    opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+                        'check if player is dead (opponent wins)
+                        If playerCard.Health < 1 Then
+                            opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
 
-                    cards.Remove(playerCard)
-                    opponentsKilled += 1
+                            cards.Remove(playerCard)
+                            opponentsKilled += 1
 
-                    Select Case playerCard.Name
-                        Case "Basic Knight"
-                            Opp.coins += 10
-                        Case "Trained Soldier"
-                            Opp.coins += 15
-                        Case "Legendary Warrior"
-                            Opp.coins += 25
-                    End Select
-                    Exit While
-                End If
+                            Select Case playerCard.Name
+                                Case "Basic Knight"
+                                    Opp.coins += 10
+                                Case "Trained Soldier"
+                                    Opp.coins += 15
+                                Case "Legendary Warrior"
+                                    Opp.coins += 25
+                            End Select
+                            Exit While
+                        End If
 
-                If isComputer Then
-                    moveOpponent(playerCard, oppCard, Player)
+
+
+                        If isComputer Then
+                            moveOpponent(playerCard, oppCard, Player)
+                        Else
+                            If Not isComputer Then
+                                fightTurn = 1
+                            End If
+                            movePlayer(playerCard, oppCard, False, True)
+                        End If
+
+
+                    End While
                 Else
-                    movePlayer(playerCard, oppCard, False)
+                    While True
+
+                        'check if opp is dead (player wins)
+                        If oppCard.Health < 1 Then
+                            playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                            Player.opponentsKilled += 1
+                            Opp.cards.Remove(oppCard)
+
+                            Select Case oppCard.Name
+                                Case "Basic Knight"
+                                    coins += 10
+                                Case "Trained Soldier"
+                                    coins += 15
+                                Case "Legendary Warrior"
+                                    coins += 25
+                            End Select
+
+                            Exit While
+                        End If
+
+                        'check if player is dead (opponent wins)
+                        If playerCard.Health < 1 Then
+                            opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+
+                            cards.Remove(playerCard)
+                            opponentsKilled += 1
+
+                            Select Case playerCard.Name
+                                Case "Basic Knight"
+                                    Opp.coins += 10
+                                Case "Trained Soldier"
+                                    Opp.coins += 15
+                                Case "Legendary Warrior"
+                                    Opp.coins += 25
+                            End Select
+                            Exit While
+                        End If
+
+
+                        If isComputer Then
+                            moveOpponent(playerCard, oppCard, Player)
+                        Else
+                            If Not isComputer Then
+                                fightTurn = 1
+                            End If
+                            movePlayer(playerCard, oppCard, False, True)
+                        End If
+
+
+                        'repeats this check after the move
+
+                        'check if opp is dead (player wins)
+                        If oppCard.Health < 1 Then
+                            playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                            Player.opponentsKilled += 1
+                            Opp.cards.Remove(oppCard)
+
+                            Select Case oppCard.Name
+                                Case "Basic Knight"
+                                    coins += 10
+                                Case "Trained Soldier"
+                                    coins += 15
+                                Case "Legendary Warrior"
+                                    coins += 25
+                            End Select
+
+                            Exit While
+                        End If
+
+                        'check if player is dead (opponent wins)
+                        If playerCard.Health < 1 Then
+                            opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+
+                            cards.Remove(playerCard)
+                            opponentsKilled += 1
+
+                            Select Case playerCard.Name
+                                Case "Basic Knight"
+                                    Opp.coins += 10
+                                Case "Trained Soldier"
+                                    Opp.coins += 15
+                                Case "Legendary Warrior"
+                                    Opp.coins += 25
+                            End Select
+                            Exit While
+                        End If
+
+
+
+
+
+                        If Not isComputer Then
+                            fightTurn = 0
+                        End If
+                        movePlayer(playerCard, oppCard, True, True)
+                    End While
                 End If
 
+            Else
+                While True
 
-            End While
+                    'check if opp is dead (player wins)
+                    If oppCard.Health < 1 Then
+                        playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                        Player.opponentsKilled += 1
+                        Opp.cards.Remove(oppCard)
 
-            If Player.first Then
-                Player.first = False
+                        Select Case oppCard.Name
+                            Case "Basic Knight"
+                                coins += 10
+                            Case "Trained Soldier"
+                                coins += 15
+                            Case "Legendary Warrior"
+                                coins += 25
+                        End Select
+
+                        Exit While
+                    End If
+
+                    'check if player is dead (opponent wins)
+                    If playerCard.Health < 1 Then
+                        opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+
+                        cards.Remove(playerCard)
+                        opponentsKilled += 1
+
+                        Select Case playerCard.Name
+                            Case "Basic Knight"
+                                Opp.coins += 10
+                            Case "Trained Soldier"
+                                Opp.coins += 15
+                            Case "Legendary Warrior"
+                                Opp.coins += 25
+                        End Select
+                        Exit While
+                    End If
+
+                    If Not isComputer Then
+                        fightTurn = 0
+                    End If
+                    movePlayer(playerCard, oppCard, True)
+
+
+
+                    'repeats this check after the move
+
+                    'check if opp is dead (player wins)
+                    If oppCard.Health < 1 Then
+                        playerWon(playerCard, oppCard, PlayerSprite, OpponentSprite)
+                        Player.opponentsKilled += 1
+                        Opp.cards.Remove(oppCard)
+
+                        Select Case oppCard.Name
+                            Case "Basic Knight"
+                                coins += 10
+                            Case "Trained Soldier"
+                                coins += 15
+                            Case "Legendary Warrior"
+                                coins += 25
+                        End Select
+
+                        Exit While
+                    End If
+
+                    'check if player is dead (opponent wins)
+                    If playerCard.Health < 1 Then
+                        opponentWon(playerCard, oppCard, PlayerSprite, OpponentSprite) ' shows opponent screen
+
+                        cards.Remove(playerCard)
+                        opponentsKilled += 1
+
+                        Select Case playerCard.Name
+                            Case "Basic Knight"
+                                Opp.coins += 10
+                            Case "Trained Soldier"
+                                Opp.coins += 15
+                            Case "Legendary Warrior"
+                                Opp.coins += 25
+                        End Select
+                        Exit While
+                    End If
+
+
+
+                    If isComputer Then
+                        moveOpponent(playerCard, oppCard, Player)
+                    Else
+                        If Not isComputer Then
+                            fightTurn = 1
+                        End If
+                        movePlayer(playerCard, oppCard, False)
+                    End If
+
+
+                End While
+
+                If Player.first Then
+                    Player.first = False
+                End If
             End If
+
+
         End Sub
 
 
@@ -1164,7 +1382,7 @@ Module Module1
         Console.SetCursorPosition(0, 0)
     End Sub
 
-    Function shopButtons(ByVal xOffset As Integer, ByVal person As Integer, ByVal buttonNumber As Integer, ByVal player As Player) As Integer
+    Function shopButtons(ByVal xOffset As Integer, ByVal person As Integer, ByVal buttonNumber As Integer, ByVal player As Player, ByVal isComputer As Boolean, ByVal turn As Integer) As Integer
         Dim xInput, yInput, input As Integer
         Dim coinsColor As ConsoleColor = ConsoleColor.Magenta
         Dim coinX As Integer = 68
@@ -1197,9 +1415,29 @@ Module Module1
 
         Console.Clear()
         showCoins(player, coinsColor, coinX, coinY)
+        If Not isComputer And turn = 0 Then
+            Console.ForegroundColor = ConsoleColor.Cyan
+            Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+        ElseIf Not isComputer And turn = 1 Then
+            Console.ForegroundColor = ConsoleColor.Magenta
+            Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+        End If
         showPerson(person, ConsoleColor.White, player)
         shopTitle(person, ConsoleColor.DarkYellow)
         showVisualStats(currentCard, currentCard, True)
+
 
 
         If yInput = 0 Then
@@ -1318,6 +1556,25 @@ Module Module1
             End If
             Console.Clear()
             showCoins(player, coinsColor, coinX, coinY)
+            If Not isComputer And turn = 0 Then
+                Console.ForegroundColor = ConsoleColor.Cyan
+                Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+            ElseIf Not isComputer And turn = 1 Then
+                Console.ForegroundColor = ConsoleColor.Magenta
+                Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+            End If
             showPerson(person, ConsoleColor.White, player)
             shopTitle(person, ConsoleColor.DarkYellow)
             showVisualStats(currentCard, currentCard, True)
@@ -1397,7 +1654,7 @@ Module Module1
     End Function
 
 
-    Function selectButtons(ByVal xOffset As Integer, ByVal Card As Object, ByVal buttonNumber As Integer, ByVal player As Player, ByVal selectedIndex As Integer) As Integer
+    Function selectButtons(ByVal xOffset As Integer, ByVal Card As Object, ByVal buttonNumber As Integer, ByVal player As Player, ByVal selectedIndex As Integer, ByVal isComputer As Boolean, ByVal turn As Integer) As Integer
         Dim xInput, yInput, input As Integer
         Dim coinsColor As ConsoleColor = ConsoleColor.Magenta
         Dim coinX As Integer = 68
@@ -1432,8 +1689,28 @@ Module Module1
 
         Console.Clear()
         showPerson(person, ConsoleColor.White, player, True, currentCardIndex)
+        Console.ForegroundColor = ConsoleColor.Cyan
+        If Not isComputer And turn = 0 Then
+            Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+        ElseIf Not isComputer And turn = 1 Then
+            Console.ForegroundColor = ConsoleColor.Magenta
+            Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+        End If
         shopTitle(person, ConsoleColor.DarkYellow, True)
         showVisualStats(currentCard, currentCard, True)
+
 
 
         If yInput = 0 Then
@@ -1506,6 +1783,7 @@ Module Module1
                     ExitShopButton(ConsoleColor.Red, False, -23 + xOffset, 21, isSelect:=True)
             End Select
         End If
+
         Console.SetCursorPosition(0, 0)
         While True
 
@@ -1552,6 +1830,25 @@ Module Module1
 
             showPerson(person, ConsoleColor.White, player, True, currentCardIndex)
             shopTitle(person, ConsoleColor.DarkYellow, True)
+            If Not isComputer And turn = 0 Then
+                Console.ForegroundColor = ConsoleColor.Cyan
+                Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER ONE --------------------------------------------------------")
+            ElseIf Not isComputer And turn = 1 Then
+                Console.ForegroundColor = ConsoleColor.Magenta
+                Console.Write("
+
+
+
+
+
+---------------------------------------------------- PLAYER TWO --------------------------------------------------------")
+            End If
             showVisualStats(currentCard, currentCard, True)
 
             If yInput = 0 Then
@@ -1652,7 +1949,8 @@ Module Module1
         Dim currentCard As Object = New BasicKnight
 
         While True
-            shopOption = shopButtons(xOffset, person, buttonNumber, player)
+            shopOption = shopButtons(xOffset, person, buttonNumber, player, isComputer, turn)
+
             Select Case person
                 Case 0
                     currentCard = New BasicKnight()
@@ -1691,7 +1989,7 @@ Module Module1
 
     End Sub
 
-    Function selectCard(ByVal player As Player)
+    Function selectCard(ByVal player As Player, ByVal isComputer As Boolean, ByVal turn As Integer)
         Const title As String = "       █     █░ ▄▄▄       ██▀███       ██████  ██▓ ███▄ ▄███▓ █    ██  ██▓    ▄▄▄     ▄▄▄█████▓ ▒█████   ██▀███  
        ▓█░ █ ░█░▒████▄    ▓██ ▒ ██▒   ▒██    ▒ ▓██▒▓██▒▀█▀ ██▒ ██  ▓██▒▓██▒   ▒████▄   ▓  ██▒ ▓▒▒██▒  ██▒▓██ ▒ ██▒
        ▒█░ █ ░█ ▒██  ▀█▄  ▓██ ░▄█ ▒   ░ ▓██▄   ▒██▒▓██    ▓██░▓██  ▒██░▒██░   ▒██  ▀█▄ ▒ ▓██░ ▒░▒██░  ██▒▓██ ░▄█ ▒
@@ -1710,8 +2008,10 @@ Module Module1
         Dim currentCard As Object = player.cards(currentCardIndex)
         Dim selectedIndex As Integer = 0
         While True
+
+
             currentCard = player.cards(currentCardIndex)
-            shopOption = selectButtons(xOffset, currentCard, buttonNumber, player, selectedIndex)
+            shopOption = selectButtons(xOffset, currentCard, buttonNumber, player, selectedIndex, isComputer:=isComputer, turn:=turn)
 
             Select Case shopOption
                 Case 0 'Left
@@ -2477,11 +2777,17 @@ Module Module1
 
         For Each line As String In PlayerSprite
             index = Array.IndexOf(PlayerSprite, line)
+
             Console.ForegroundColor = fg
             Console.BackgroundColor = bg
 
+            If fightTurn = 1 Then
+                Console.ForegroundColor = ConsoleColor.DarkGray
+            End If
+
             If index = PlayerSprite.Length - 1 Then
                 Console.ForegroundColor = pTextColorFG
+
             End If
 
             Console.SetCursorPosition(0, Console.CursorTop)
@@ -2494,7 +2800,9 @@ Module Module1
             index = Array.IndexOf(OpponentSprite, line)
             Console.ForegroundColor = fg
             Console.BackgroundColor = bg
-
+            If fightTurn = 0 Then
+                Console.ForegroundColor = ConsoleColor.DarkGray
+            End If
             If index = OpponentSprite.Length - 1 Then
                 Console.ForegroundColor = oTextColorFG
             End If
@@ -2517,7 +2825,7 @@ Module Module1
         Console.SetCursorPosition(0, 0)
     End Sub
 
-    Function doOptionButtons(ByVal PlayerCard As Object, ByVal OpponentCard As Object, Optional ByVal yOffset As Integer = 0, Optional ByVal wantSprites As Boolean = False) As String()()
+    Function doOptionButtons(ByVal PlayerCard As Object, ByVal OpponentCard As Object, Optional ByVal yOffset As Integer = 0, Optional ByVal wantSprites As Boolean = False, Optional isComputer As Boolean = True) As String()()
         Dim rPad As Integer = 2
         Dim maxAttackLen As Integer = 29 + 1 + rPad
         Dim maxDefendLen As Integer = 30 + 1 + rPad
@@ -2610,11 +2918,18 @@ Module Module1
             HealButton(rPad, False, maxDefendLen + maxAttackLen, yOffset)
         End If
 
-
-        If PlayerCard.usedPower Then
-            PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=True)
+        If isComputer Then
+            If PlayerCard.usedPower Then
+                PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=True)
+            Else
+                PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=False)
+            End If
         Else
-            PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=False)
+            If OpponentCard.usedPower Then
+                PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=True)
+            Else
+                PowerButton(rPad, False, maxDefendLen + maxAttackLen + maxHealLen, yOffset, disabled:=False)
+            End If
         End If
 
 
@@ -2707,10 +3022,18 @@ Module Module1
 
 
                     Case 3
-                        If PlayerCard.usedPower = False Then
-                            selected = {"p"}
+                        If isComputer Then
+                            If PlayerCard.usedPower = False Then
+                                selected = {"p"}
 
-                            Exit While
+                                Exit While
+                            End If
+                        Else
+                            If OpponentCard.usedPower = False Then
+                                selected = {"p"}
+
+                                Exit While
+                            End If
                         End If
                 End Select
             End If
@@ -2721,7 +3044,7 @@ Module Module1
 
             displayCharAndStats(PlayerCard, OpponentCard, playerSprite, opponentSprite)
 
-            selectInput(xInput, PlayerCard, OpponentCard, playerSprite, opponentSprite, rPad, yOffset, maxAttackLen, maxDefendLen, maxHealLen)
+            selectInput(xInput, PlayerCard, OpponentCard, playerSprite, opponentSprite, rPad, yOffset, maxAttackLen, maxDefendLen, maxHealLen, isComputer:=isComputer)
             Console.SetCursorPosition(0, 0)
 
 
@@ -2732,7 +3055,7 @@ Module Module1
         Return returnValue
     End Function
 
-    Sub selectInput(ByVal xInput As Integer, ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal opponentSprite As String(), ByVal rPad As Integer, ByVal yOffset As Integer, ByVal maxAttacklen As Integer, ByVal maxDefendLen As Integer, ByVal maxHealLen As Integer)
+    Sub selectInput(ByVal xInput As Integer, ByVal PlayerCard As Object, ByVal OpponentCard As Object, ByVal PlayerSprite As String(), ByVal opponentSprite As String(), ByVal rPad As Integer, ByVal yOffset As Integer, ByVal maxAttacklen As Integer, ByVal maxDefendLen As Integer, ByVal maxHealLen As Integer, ByVal isComputer As Boolean)
         Select Case xInput
             Case 0
 
@@ -2746,11 +3069,21 @@ Module Module1
                     HealButton(rPad, False, maxDefendLen + maxAttacklen, yOffset, disabled:=False)
                 End If
 
-                If PlayerCard.usedPower Then
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                If isComputer Then
+                    If PlayerCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 Else
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    If OpponentCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 End If
+
+
             Case 1
 
 
@@ -2764,11 +3097,22 @@ Module Module1
                     HealButton(rPad, False, maxDefendLen + maxAttacklen, yOffset)
                 End If
 
-                If PlayerCard.usedPower Then
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+
+
+                If isComputer Then
+                    If PlayerCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 Else
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    If OpponentCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 End If
+
             Case 2
 
 
@@ -2782,10 +3126,20 @@ Module Module1
                     HealButton(rPad, True, maxDefendLen + maxAttacklen, yOffset)
                 End If
 
-                If PlayerCard.usedPower Then
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+
+
+                If isComputer Then
+                    If PlayerCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 Else
-                    PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    If OpponentCard.usedPower Then
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, False, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
                 End If
             Case 3
 
@@ -2805,9 +3159,36 @@ Module Module1
                 Else
                     PowerButton(rPad, True, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
                 End If
+                If isComputer Then
+                    If PlayerCard.usedPower Then
+                        PowerButton(rPad, True, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, True, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
+                Else
+                    If OpponentCard.usedPower Then
+                        PowerButton(rPad, True, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=True)
+                    Else
+                        PowerButton(rPad, True, maxDefendLen + maxAttacklen + maxHealLen, yOffset, disabled:=False)
+                    End If
+                End If
         End Select
     End Sub
+    Sub playerMovePrompt()
+        Dim prompt As String() = {"  _   _   _  __  __    _     ___ _  _    ___ _          _        _    _       ", " |_) |_) |_ (_  (_    |_ |\ | | |_ |_)    | / \   |\/| / \ \  / |_   / \ |\ | ", " |   | \ |_ __) __)   |_ | \| | |_ | \    | \_/   |  | \_/  \/  |_   \_/ | \| "}
+        Dim fGp As ConsoleColor = ConsoleColor.DarkGray
+        Dim cXp As Integer = 20
+        Dim line As String
 
+        Console.SetCursorPosition(cXp, 25)
+        For lineIndex = 0 To prompt.Length - 1
+            Console.ForegroundColor = fGp
+            line = prompt(lineIndex)
+            Console.WriteLine(line)
+            Console.SetCursorPosition(cXp, lineIndex + 26)
+        Next
+        Console.SetCursorPosition(0, 0)
+    End Sub
     Sub oppMovePrompt()
         Dim prompt As String() = {"  _   _   _  __  __    _     ___ _  _     _  _   _     _   _   _   _        _     ___   ___ _          _        _ ", " |_) |_) |_ (_  (_    |_ |\ | | |_ |_)   |_ / \ |_)   / \ |_) |_) / \ |\ | |_ |\ | |     | / \   |\/| / \ \  / |_ ", " |   | \ |_ __) __)   |_ | \| | |_ | \   |  \_/ | \   \_/ |   |   \_/ | \| |_ | \| |     | \_/   |  | \_/  \/  |_"}
         Dim fGp As ConsoleColor = ConsoleColor.DarkGray
@@ -3355,6 +3736,7 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
 
         Dim isComputer As Boolean
 
+
         checkEmpty() 'populates the text file that saves high scores if empty
 
         Console.CursorVisible = False
@@ -3390,10 +3772,10 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
             showOpponent(Opp1)
         End If
 
-        selectedIndex = selectCard(player1)
+        selectedIndex = selectCard(player1, isComputer, turn:=0)
         playerCard = player1.cards(selectedIndex)
         If Not isComputer Then
-            player2SelectedIndex = selectCard(player2)
+            player2SelectedIndex = selectCard(player2, isComputer, turn:=1)
             player2PlayerCard = player2.cards(player2SelectedIndex)
         End If
 
@@ -3405,6 +3787,7 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
                 player1.fight(Opp1, player1, isComputer, selectedIndex)
             Else
                 player1.fight(player2, player1, isComputer, selectedIndex, player2SelectedIndex)
+
             End If
 
 
@@ -3430,10 +3813,10 @@ This game was Made by Prithiv Jith 8F - Hope you enjoy :)")
                 showOpponent(Opp1)
             End If
 
-            selectedIndex = selectCard(player1)
+            selectedIndex = selectCard(player1, isComputer:=isComputer, turn:=0)
             playerCard = player1.cards(selectedIndex)
             If Not isComputer Then
-                player2SelectedIndex = selectCard(player2)
+                player2SelectedIndex = selectCard(player2, isComputer:=isComputer, turn:=1)
                 player2PlayerCard = player2.cards(player2SelectedIndex)
             End If
         End While
